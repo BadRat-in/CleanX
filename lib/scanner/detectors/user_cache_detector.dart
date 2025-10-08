@@ -6,8 +6,6 @@ import '../scan_item.dart';
 
 class UserCacheDetector {
   Future<List<ScanItem>> scan() async {
-    // For now, we'll return hardcoded data.
-    // In the future, this will scan the file system.
     final homeDir = Platform.environment['HOME'];
     if (homeDir == null) {
       return [];
@@ -16,25 +14,55 @@ class UserCacheDetector {
     final cachesPath = p.join(homeDir, 'Library', 'Caches');
     final logsPath = p.join(homeDir, 'Library', 'Logs');
 
-    return [
-      ScanItem(
+    final items = <ScanItem>[];
+
+    final cachesDir = Directory(cachesPath);
+    if (await cachesDir.exists()) {
+      final size = await _getDirectorySize(cachesDir);
+      items.add(ScanItem(
         id: 'user_caches',
         path: cachesPath,
         name: 'User Caches',
         type: FileType.directory,
-        sizeBytes: 1024 * 1024 * 123, // 123 MB
-        lastModified: DateTime.now().subtract(const Duration(days: 10)),
+        sizeBytes: size,
+        lastModified: (await cachesDir.stat()).modified,
         detectorName: 'UserCacheDetector',
-      ),
-      ScanItem(
+      ));
+    }
+
+    final logsDir = Directory(logsPath);
+    if (await logsDir.exists()) {
+      final size = await _getDirectorySize(logsDir);
+      items.add(ScanItem(
         id: 'user_logs',
         path: logsPath,
         name: 'User Logs',
         type: FileType.directory,
-        sizeBytes: 1024 * 1024 * 45, // 45 MB
-        lastModified: DateTime.now().subtract(const Duration(days: 5)),
+        sizeBytes: size,
+        lastModified: (await logsDir.stat()).modified,
         detectorName: 'UserCacheDetector',
-      ),
-    ];
+      ));
+    }
+
+    return items;
+  }
+
+  Future<int> _getDirectorySize(Directory dir) async {
+    var size = 0;
+    try {
+      final files = await dir.list(recursive: true).toList();
+      for (final file in files) {
+        if (file is File) {
+          try {
+            size += await file.length();
+          } catch (e) {
+            // Ignore files that can't be accessed.
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore directories that can't be accessed.
+    }
+    return size;
   }
 }
