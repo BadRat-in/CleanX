@@ -8,7 +8,7 @@ class MainFlutterWindow: NSWindow {
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)
 
-    let channel = FlutterMethodChannel(name: "com.cleandev.app/file_operations", binaryMessenger: flutterViewController.engine.binaryMessenger)
+    let channel = FlutterMethodChannel(name: "com.cleanx.app/file_operations", binaryMessenger: flutterViewController.engine.binaryMessenger)
     channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
       if call.method == "moveToTrash" {
         if let args = call.arguments as? [String: Any],
@@ -28,6 +28,7 @@ class MainFlutterWindow: NSWindow {
       }
     }
 
+    self.title = "CleanX"
     RegisterGeneratedPlugins(registry: flutterViewController)
 
     super.awakeFromNib()

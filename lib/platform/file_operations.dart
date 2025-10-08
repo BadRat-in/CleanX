@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 class FileOperations {
-  static const platform = MethodChannel('com.cleandev.app/file_operations');
+  static const platform = MethodChannel('com.cleanx.app/file_operations');
 
   static Future<bool> moveToTrash(String filePath) async {
     try {

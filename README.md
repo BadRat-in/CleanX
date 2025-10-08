@@ -1,6 +1,6 @@
-# cleanx
+# CleanX
 
-A new Flutter project.
+A developer-first cleaning utility for macOS, built with Flutter.
 
 ## Getting Started
 

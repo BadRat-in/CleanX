@@ -4,15 +4,15 @@ import 'package:cleanx/scanner/scanner_engine.dart';
 import 'package:cleanx/ui/widgets/custom_cupertino_list_tile.dart';
 import 'package:flutter/cupertino.dart';
 
-void main() => runApp(const CleanDevApp());
+void main() => runApp(const CleanXApp());
 
-class CleanDevApp extends StatelessWidget {
-  const CleanDevApp({super.key});
+class CleanXApp extends StatelessWidget {
+  const CleanXApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const CupertinoApp(
-      title: 'CleanDev',
+      title: 'CleanX',
       theme: CupertinoThemeData(
         brightness: Brightness.dark,
         primaryColor: CupertinoColors.activeGreen,
@@ -59,7 +59,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // This is intentionally minimal — expand into real data-driven widgets.
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
-        middle: Text('CleanDev'),
+        middle: Text('CleanX'),
       ),
       child: SafeArea(
         child: Padding(
