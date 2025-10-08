@@ -90,7 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 20),
               Expanded(
-                  child: _RecentActivityList(
+                  child: _GroupedScanResults(
                 scanItems: _scanItems,
                 onItemSelectionChanged: (item, selected) {
                   setState(() {
@@ -150,8 +150,8 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-class _RecentActivityList extends StatelessWidget {
-  const _RecentActivityList(
+class _GroupedScanResults extends StatelessWidget {
+  const _GroupedScanResults(
       {required this.scanItems, required this.onItemSelectionChanged});
 
   final List<ScanItem> scanItems;
@@ -164,21 +164,52 @@ class _RecentActivityList extends StatelessWidget {
         child: Text("Click 'Quick Scan' to start."),
       );
     }
+
+    final groupedItems = <String, List<ScanItem>>{};
+    for (final item in scanItems) {
+      if (groupedItems.containsKey(item.detectorName)) {
+        groupedItems[item.detectorName]!.add(item);
+      } else {
+        groupedItems[item.detectorName] = [item];
+      }
+    }
+
     return ListView.builder(
-      itemCount: scanItems.length,
+      itemCount: groupedItems.length,
       itemBuilder: (context, index) {
-        final item = scanItems[index];
-        final sizeInMB = item.sizeBytes / (1024 * 1024);
-        return CustomCupertinoListTile(
-          leading: CupertinoCheckbox(
-            value: item.selected,
-            onChanged: (value) {
-              onItemSelectionChanged(item, value ?? false);
-            },
-          ),
-          title: Text(item.name),
-          subtitle: Text(item.path),
-          trailing: Text('${sizeInMB.toStringAsFixed(2)} MB'),
+        final detectorName = groupedItems.keys.elementAt(index);
+        final items = groupedItems[detectorName]!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                detectorName,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const ClampingScrollPhysics(),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                final sizeInMB = item.sizeBytes / (1024 * 1024);
+                return CustomCupertinoListTile(
+                  leading: CupertinoCheckbox(
+                    value: item.selected,
+                    onChanged: (value) {
+                      onItemSelectionChanged(item, value ?? false);
+                    },
+                  ),
+                  title: Text(item.name),
+                  subtitle: Text(item.path),
+                  trailing: Text('${sizeInMB.toStringAsFixed(2)} MB'),
+                );
+              },
+            ),
+          ],
         );
       },
     );

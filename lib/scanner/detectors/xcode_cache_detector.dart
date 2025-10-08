@@ -5,9 +5,9 @@ import 'package:path/path.dart' as p;
 import '../detector.dart';
 import '../scan_item.dart';
 
-class UserCacheDetector implements Detector {
+class XcodeCacheDetector implements Detector {
   @override
-  String get name => 'User Caches';
+  String get name => 'Xcode Caches';
 
   @override
   Future<List<ScanItem>> scan() async {
@@ -16,35 +16,19 @@ class UserCacheDetector implements Detector {
       return [];
     }
 
-    final cachesPath = p.join(homeDir, 'Library', 'Caches');
-    final logsPath = p.join(homeDir, 'Library', 'Logs');
-
     final items = <ScanItem>[];
+    final derivedDataPath = p.join(homeDir, 'Library', 'Developer', 'Xcode', 'DerivedData');
+    final derivedDataDir = Directory(derivedDataPath);
 
-    final cachesDir = Directory(cachesPath);
-    if (await cachesDir.exists()) {
-      final size = await _getDirectorySize(cachesDir);
+    if (await derivedDataDir.exists()) {
+      final size = await _getDirectorySize(derivedDataDir);
       items.add(ScanItem(
-        id: 'user_caches',
-        path: cachesPath,
-        name: 'User Caches',
+        id: 'derived_data',
+        path: derivedDataPath,
+        name: 'Xcode DerivedData',
         type: FileType.directory,
         sizeBytes: size,
-        lastModified: (await cachesDir.stat()).modified,
-        detectorName: name,
-      ));
-    }
-
-    final logsDir = Directory(logsPath);
-    if (await logsDir.exists()) {
-      final size = await _getDirectorySize(logsDir);
-      items.add(ScanItem(
-        id: 'user_logs',
-        path: logsPath,
-        name: 'User Logs',
-        type: FileType.directory,
-        sizeBytes: size,
-        lastModified: (await logsDir.stat()).modified,
+        lastModified: (await derivedDataDir.stat()).modified,
         detectorName: name,
       ));
     }

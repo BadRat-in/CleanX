@@ -5,9 +5,9 @@ import 'package:path/path.dart' as p;
 import '../detector.dart';
 import '../scan_item.dart';
 
-class UserCacheDetector implements Detector {
+class FlutterCacheDetector implements Detector {
   @override
-  String get name => 'User Caches';
+  String get name => 'Flutter Caches';
 
   @override
   Future<List<ScanItem>> scan() async {
@@ -16,35 +16,19 @@ class UserCacheDetector implements Detector {
       return [];
     }
 
-    final cachesPath = p.join(homeDir, 'Library', 'Caches');
-    final logsPath = p.join(homeDir, 'Library', 'Logs');
-
     final items = <ScanItem>[];
+    final pubCachePath = p.join(homeDir, '.pub-cache');
+    final pubCacheDir = Directory(pubCachePath);
 
-    final cachesDir = Directory(cachesPath);
-    if (await cachesDir.exists()) {
-      final size = await _getDirectorySize(cachesDir);
+    if (await pubCacheDir.exists()) {
+      final size = await _getDirectorySize(pubCacheDir);
       items.add(ScanItem(
-        id: 'user_caches',
-        path: cachesPath,
-        name: 'User Caches',
+        id: 'pub_cache',
+        path: pubCachePath,
+        name: 'Pub Cache',
         type: FileType.directory,
         sizeBytes: size,
-        lastModified: (await cachesDir.stat()).modified,
-        detectorName: name,
-      ));
-    }
-
-    final logsDir = Directory(logsPath);
-    if (await logsDir.exists()) {
-      final size = await _getDirectorySize(logsDir);
-      items.add(ScanItem(
-        id: 'user_logs',
-        path: logsPath,
-        name: 'User Logs',
-        type: FileType.directory,
-        sizeBytes: size,
-        lastModified: (await logsDir.stat()).modified,
+        lastModified: (await pubCacheDir.stat()).modified,
         detectorName: name,
       ));
     }
