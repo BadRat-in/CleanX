@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:cleanx/models/scan_item.dart';
+import 'package:cleanx/utils/file_utils.dart';
 import 'package:path/path.dart' as p;
 
 import '../detector.dart';
-import 'package:cleanx/models/scan_item.dart';
 
 class XcodeCacheDetector implements Detector {
   @override
@@ -17,11 +18,12 @@ class XcodeCacheDetector implements Detector {
     }
 
     final items = <ScanItem>[];
-    final derivedDataPath = p.join(homeDir, 'Library', 'Developer', 'Xcode', 'DerivedData');
+    final derivedDataPath =
+        p.join(homeDir, 'Library', 'Developer', 'Xcode', 'DerivedData');
     final derivedDataDir = Directory(derivedDataPath);
 
     if (await derivedDataDir.exists()) {
-      final size = await _getDirectorySize(derivedDataDir);
+      final size = await getDirectorySize(derivedDataDir);
       items.add(ScanItem(
         id: 'derived_data',
         path: derivedDataPath,
@@ -34,24 +36,5 @@ class XcodeCacheDetector implements Detector {
     }
 
     return items;
-  }
-
-  Future<int> _getDirectorySize(Directory dir) async {
-    var size = 0;
-    try {
-      final files = await dir.list(recursive: true).toList();
-      for (final file in files) {
-        if (file is File) {
-          try {
-            size += await file.length();
-          } catch (e) {
-            // Ignore files that can't be accessed.
-          }
-        }
-      }
-    } catch (e) {
-      // Ignore directories that can't be accessed.
-    }
-    return size;
   }
 }

@@ -6,9 +6,9 @@ import 'package:path/path.dart' as p;
 
 import '../detector.dart';
 
-class FlutterCacheDetector implements Detector {
+class CocoapodsCacheDetector implements Detector {
   @override
-  String get name => 'Flutter Caches';
+  String get name => 'CocoaPods Caches';
 
   @override
   Future<List<ScanItem>> scan() async {
@@ -18,18 +18,18 @@ class FlutterCacheDetector implements Detector {
     }
 
     final items = <ScanItem>[];
-    final pubCachePath = p.join(homeDir, '.pub-cache');
-    final pubCacheDir = Directory(pubCachePath);
+    final cocoapodsCachePath = p.join(homeDir, '.cocoapods', 'repos');
+    final cocoapodsCacheDir = Directory(cocoapodsCachePath);
 
-    if (await pubCacheDir.exists()) {
-      final size = await getDirectorySize(pubCacheDir);
+    if (await cocoapodsCacheDir.exists()) {
+      final size = await getDirectorySize(cocoapodsCacheDir);
       items.add(ScanItem(
-        id: 'pub_cache',
-        path: pubCachePath,
-        name: 'Pub Cache',
+        id: 'cocoapods_cache',
+        path: cocoapodsCachePath,
+        name: 'CocoaPods Caches',
         type: FileType.directory,
         sizeBytes: size,
-        lastModified: (await pubCacheDir.stat()).modified,
+        lastModified: (await cocoapodsCacheDir.stat()).modified,
         detectorName: name,
       ));
     }

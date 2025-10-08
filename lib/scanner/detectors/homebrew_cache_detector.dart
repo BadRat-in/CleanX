@@ -6,9 +6,9 @@ import 'package:path/path.dart' as p;
 
 import '../detector.dart';
 
-class FlutterCacheDetector implements Detector {
+class HomebrewCacheDetector implements Detector {
   @override
-  String get name => 'Flutter Caches';
+  String get name => 'Homebrew Caches';
 
   @override
   Future<List<ScanItem>> scan() async {
@@ -18,18 +18,18 @@ class FlutterCacheDetector implements Detector {
     }
 
     final items = <ScanItem>[];
-    final pubCachePath = p.join(homeDir, '.pub-cache');
-    final pubCacheDir = Directory(pubCachePath);
+    final homebrewCachePath = p.join(homeDir, 'Library', 'Caches', 'Homebrew');
+    final homebrewCacheDir = Directory(homebrewCachePath);
 
-    if (await pubCacheDir.exists()) {
-      final size = await getDirectorySize(pubCacheDir);
+    if (await homebrewCacheDir.exists()) {
+      final size = await getDirectorySize(homebrewCacheDir);
       items.add(ScanItem(
-        id: 'pub_cache',
-        path: pubCachePath,
-        name: 'Pub Cache',
+        id: 'homebrew_cache',
+        path: homebrewCachePath,
+        name: 'Homebrew Caches',
         type: FileType.directory,
         sizeBytes: size,
-        lastModified: (await pubCacheDir.stat()).modified,
+        lastModified: (await homebrewCacheDir.stat()).modified,
         detectorName: name,
       ));
     }

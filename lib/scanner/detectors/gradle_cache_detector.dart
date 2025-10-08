@@ -6,9 +6,9 @@ import 'package:path/path.dart' as p;
 
 import '../detector.dart';
 
-class FlutterCacheDetector implements Detector {
+class GradleCacheDetector implements Detector {
   @override
-  String get name => 'Flutter Caches';
+  String get name => 'Gradle Caches';
 
   @override
   Future<List<ScanItem>> scan() async {
@@ -18,18 +18,18 @@ class FlutterCacheDetector implements Detector {
     }
 
     final items = <ScanItem>[];
-    final pubCachePath = p.join(homeDir, '.pub-cache');
-    final pubCacheDir = Directory(pubCachePath);
+    final gradleCachePath = p.join(homeDir, '.gradle', 'caches');
+    final gradleCacheDir = Directory(gradleCachePath);
 
-    if (await pubCacheDir.exists()) {
-      final size = await getDirectorySize(pubCacheDir);
+    if (await gradleCacheDir.exists()) {
+      final size = await getDirectorySize(gradleCacheDir);
       items.add(ScanItem(
-        id: 'pub_cache',
-        path: pubCachePath,
-        name: 'Pub Cache',
+        id: 'gradle_cache',
+        path: gradleCachePath,
+        name: 'Gradle Caches',
         type: FileType.directory,
         sizeBytes: size,
-        lastModified: (await pubCacheDir.stat()).modified,
+        lastModified: (await gradleCacheDir.stat()).modified,
         detectorName: name,
       ));
     }

@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:cleanx/models/scan_item.dart';
+import 'package:cleanx/utils/file_utils.dart';
 import 'package:path/path.dart' as p;
 
 import '../detector.dart';
-import 'package:cleanx/models/scan_item.dart';
 
 class UserCacheDetector implements Detector {
   @override
@@ -33,7 +34,7 @@ class UserCacheDetector implements Detector {
 
     await for (final entity in dir.list(followLinks: false)) {
       if (entity is Directory) {
-        final size = await _getDirectorySize(entity);
+        final size = await getDirectorySize(entity);
         if (size > 0) {
           items.add(ScanItem(
             id: entity.path,
@@ -47,24 +48,5 @@ class UserCacheDetector implements Detector {
         }
       }
     }
-  }
-
-  Future<int> _getDirectorySize(Directory dir) async {
-    var size = 0;
-    try {
-      final files = await dir.list(recursive: true).toList();
-      for (final file in files) {
-        if (file is File) {
-          try {
-            size += await file.length();
-          } catch (e) {
-            // Ignore files that can't be accessed.
-          }
-        }
-      }
-    } catch (e) {
-      // Ignore directories that can't be accessed.
-    }
-    return size;
   }
 }
