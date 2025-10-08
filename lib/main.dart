@@ -1,3 +1,4 @@
+import 'package:cleanx/platform/file_operations.dart';
 import 'package:cleanx/scanner/scan_item.dart';
 import 'package:cleanx/scanner/scanner_engine.dart';
 import 'package:cleanx/ui/widgets/custom_cupertino_list_tile.dart';
@@ -45,6 +46,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  Future<void> _clean() async {
+    final selectedItems = _scanItems.where((item) => item.selected).toList();
+    for (final item in selectedItems) {
+      await FileOperations.moveToTrash(item.path);
+    }
+    _runQuickScan();
+  }
+
   @override
   Widget build(BuildContext context) {
     // This is intentionally minimal — expand into real data-driven widgets.
@@ -60,9 +69,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 8),
               _SummaryCard(scanItems: _scanItems),
               const SizedBox(height: 20),
-              CupertinoButton.filled(
-                onPressed: _runQuickScan,
-                child: const Text('Quick Scan'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CupertinoButton.filled(
+                    onPressed: _runQuickScan,
+                    child: const Text('Quick Scan'),
+                  ),
+                  const SizedBox(width: 12),
+                  CupertinoButton(
+                    onPressed: _clean,
+                    child: const Text('Clean'),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               CupertinoButton(
@@ -70,7 +89,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onPressed: () {},
               ),
               const SizedBox(height: 20),
-              Expanded(child: _RecentActivityList(scanItems: _scanItems)),
+              Expanded(
+                  child: _RecentActivityList(
+                scanItems: _scanItems,
+                onItemSelectionChanged: (item, selected) {
+                  setState(() {
+                    item.selected = selected;
+                  });
+                },
+              )),
             ],
           ),
         ),
@@ -92,7 +119,8 @@ class _SummaryCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: CupertinoColors.extraLightBackgroundGray.withAlpha((255 * 0.06).round()),
+        color: CupertinoColors.extraLightBackgroundGray
+            .withAlpha((255 * 0.06).round()),
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.all(16),
@@ -123,9 +151,11 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _RecentActivityList extends StatelessWidget {
-  const _RecentActivityList({required this.scanItems});
+  const _RecentActivityList(
+      {required this.scanItems, required this.onItemSelectionChanged});
 
   final List<ScanItem> scanItems;
+  final Function(ScanItem, bool) onItemSelectionChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +170,12 @@ class _RecentActivityList extends StatelessWidget {
         final item = scanItems[index];
         final sizeInMB = item.sizeBytes / (1024 * 1024);
         return CustomCupertinoListTile(
+          leading: CupertinoCheckbox(
+            value: item.selected,
+            onChanged: (value) {
+              onItemSelectionChanged(item, value ?? false);
+            },
+          ),
           title: Text(item.name),
           subtitle: Text(item.path),
           trailing: Text('${sizeInMB.toStringAsFixed(2)} MB'),
