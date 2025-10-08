@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import '../detector.dart';
-import '../scan_item.dart';
+import 'package:cleanx/models/scan_item.dart';
 
 class NodeCacheDetector implements Detector {
   @override

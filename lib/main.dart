@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:cleanx/platform/file_operations.dart';
-import 'package:cleanx/scanner/scan_item.dart';
+import 'package:cleanx/fs/file_ops.dart';
+import 'package:cleanx/models/scan_item.dart';
 import 'package:cleanx/scanner/scanner_engine.dart';
 import 'package:cleanx/storage/settings_service.dart';
 import 'package:cleanx/ui/screens/settings_screen.dart';
@@ -62,6 +62,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _runQuickScan() async {
     final items = await _scannerEngine.scan();
+    setState(() {
+      _scanItems = items;
+    });
+  }
+
+  Future<void> _runDeepScan() async {
+    final items = await _scannerEngine.deepScan();
     setState(() {
       _scanItems = items;
     });
@@ -176,8 +183,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 12),
               CupertinoButton(
+                onPressed: _runDeepScan,
                 child: const Text('Deep Scan (Dev Tools)'),
-                onPressed: () {},
               ),
               const SizedBox(height: 20),
               Expanded(

@@ -3,7 +3,7 @@ import 'detectors/flutter_cache_detector.dart';
 import 'detectors/node_cache_detector.dart';
 import 'detectors/user_cache_detector.dart';
 import 'detectors/xcode_cache_detector.dart';
-import 'scan_item.dart';
+import 'package:cleanx/models/scan_item.dart';
 
 class ScannerEngine {
   final List<Detector> _detectors = [
@@ -20,5 +20,9 @@ class ScannerEngine {
       allItems.addAll(items);
     }
     return allItems;
+  Future<List<ScanItem>> deepScan() async {
+    // For now, this is the same as a quick scan.
+    // In the future, we'll add more detectors here.
+    return scan();
   }
 }

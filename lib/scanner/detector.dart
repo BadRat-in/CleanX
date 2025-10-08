@@ -1,4 +1,4 @@
-import '../scan_item.dart';
+import 'package:cleanx/models/scan_item.dart';
 
 abstract class Detector {
   String get name;

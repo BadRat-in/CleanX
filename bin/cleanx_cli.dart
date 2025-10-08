@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:cleanx/scanner/scanner_engine.dart';
 import 'package:args/args.dart';

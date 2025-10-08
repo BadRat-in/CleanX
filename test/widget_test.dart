@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('Initial UI test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const CleanDevApp());
+    await tester.pumpWidget(const CleanXApp());
 
     // Verify that the initial UI is correct.
     expect(find.text("Click 'Quick Scan' to start."), findsOneWidget);
