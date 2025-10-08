@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cleanx/platform/file_operations.dart';
 import 'package:cleanx/scanner/scan_item.dart';
 import 'package:cleanx/scanner/scanner_engine.dart';
+import 'package:cleanx/storage/settings_service.dart';
 import 'package:cleanx/ui/screens/settings_screen.dart';
 import 'package:cleanx/ui/widgets/custom_cupertino_list_tile.dart';
 import 'package:flutter/cupertino.dart';
@@ -42,8 +43,22 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final _scannerEngine = ScannerEngine();
+  final _settingsService = SettingsService();
   List<ScanItem> _scanItems = [];
   DeleteAction _deleteAction = DeleteAction.trash;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final deleteAction = await _settingsService.getDeleteAction();
+    setState(() {
+      _deleteAction = deleteAction;
+    });
+  }
 
   Future<void> _runQuickScan() async {
     final items = await _scannerEngine.scan();
@@ -129,6 +144,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             );
             if (newDeleteAction != null) {
+              await _settingsService.setDeleteAction(newDeleteAction);
               setState(() {
                 _deleteAction = newDeleteAction;
               });
