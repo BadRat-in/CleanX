@@ -13,7 +13,7 @@ A developer-first cleaning utility for macOS, built with Flutter.
 To get started with CleanX, you'll need to have Flutter installed. Then, you can clone the repository and run the app:
 
 ```bash
-git clone https://github.com/your-username/cleanx.git
+git clone https://github.com/Badrat-in/cleanx.git
 cd cleanx
 flutter run -d macos
 ```
