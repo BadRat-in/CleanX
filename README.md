@@ -2,15 +2,47 @@
 
 A developer-first cleaning utility for macOS, built with Flutter.
 
+## Features
+
+- **Deep Scans:** CleanX scans for caches from a variety of developer tools, including Xcode, Node.js, Flutter, and more.
+- **Customizable Cleaning:** Choose what to clean and how to clean it. Move files to the trash, delete them permanently, or back them up to a ZIP file.
+- **CLI for Automation:** Use the command-line interface to integrate CleanX into your automated workflows.
+
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To get started with CleanX, you'll need to have Flutter installed. Then, you can clone the repository and run the app:
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+git clone https://github.com/your-username/cleanx.git
+cd cleanx
+flutter run -d macos
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## CLI Usage
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The CleanX CLI allows you to scan and clean your system from the command line.
+
+### Scan
+
+To scan for caches, use the `scan` command:
+
+```bash
+dart run bin/cleanx_cli.dart --scan
+```
+
+This will output a JSON array of the caches that were found.
+
+### Clean
+
+To clean the caches, you can use the `clean` command with the output of the `scan` command:
+
+```bash
+dart run bin/cleanx_cli.dart --scan > caches.json
+dart run bin/cleanx_cli.dart --clean --input caches.json
+```
+
+You can also use the `--dry-run` flag to see what would be cleaned without actually deleting any files:
+
+```bash
+dart run bin/cleanx_cli.dart --clean --input caches.json --dry-run
+```
