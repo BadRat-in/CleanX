@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:cleanx/platform/file_operations.dart';
 import 'package:cleanx/scanner/scan_item.dart';
 import 'package:cleanx/scanner/scanner_engine.dart';
+import 'package:cleanx/ui/screens/settings_screen.dart';
 import 'package:cleanx/ui/widgets/custom_cupertino_list_tile.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(const CleanXApp());
 
@@ -38,6 +43,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final _scannerEngine = ScannerEngine();
   List<ScanItem> _scanItems = [];
+  DeleteAction _deleteAction = DeleteAction.trash;
 
   Future<void> _runQuickScan() async {
     final items = await _scannerEngine.scan();
@@ -48,8 +54,59 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _clean() async {
     final selectedItems = _scanItems.where((item) => item.selected).toList();
-    for (final item in selectedItems) {
-      await FileOperations.moveToTrash(item.path);
+    if (selectedItems.isEmpty) {
+      return;
+    }
+
+    final confirmed = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Confirm Clean'),
+        content: Text(
+            'Are you sure you want to clean ${selectedItems.length} items?'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: const Text('Clean'),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    switch (_deleteAction) {
+      case DeleteAction.trash:
+        for (final item in selectedItems) {
+          await FileOperations.moveToTrash(item.path);
+        }
+        break;
+      case DeleteAction.permanent:
+        for (final item in selectedItems) {
+          await FileOperations.permanentDelete(item.path);
+        }
+        break;
+      case DeleteAction.backup:
+        final backupDir = Directory(p.join(
+            (await getApplicationDocumentsDirectory()).path, 'backups'));
+        if (!await backupDir.exists()) {
+          await backupDir.create(recursive: true);
+        }
+        final backupPath =
+            p.join(backupDir.path, 'backup-${DateTime.now().toIso8601String()}.zip');
+        await FileOperations.backupToZip(
+            selectedItems.map((i) => i.path).toList(), backupPath);
+        for (final item in selectedItems) {
+          await FileOperations.moveToTrash(item.path);
+        }
+        break;
     }
     _runQuickScan();
   }
@@ -58,8 +115,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     // This is intentionally minimal — expand into real data-driven widgets.
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('CleanX'),
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('CleanX'),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.settings),
+          onPressed: () async {
+            final newDeleteAction = await Navigator.push<DeleteAction>(
+              context,
+              CupertinoPageRoute(
+                builder: (context) =>
+                    SettingsScreen(initialDeleteAction: _deleteAction),
+              ),
+            );
+            if (newDeleteAction != null) {
+              setState(() {
+                _deleteAction = newDeleteAction;
+              });
+            }
+          },
+        ),
       ),
       child: SafeArea(
         child: Padding(

@@ -23,6 +23,19 @@ class MainFlutterWindow: NSWindow {
         } else {
           result(FlutterError(code: "INVALID_ARGUMENTS", message: "filePath not provided or invalid", details: nil))
         }
+      } else if call.method == "permanentDelete" {
+        if let args = call.arguments as? [String: Any],
+           let filePath = args["filePath"] as? String {
+          let fileURL = URL(fileURLWithPath: filePath)
+          do {
+            try FileManager.default.removeItem(at: fileURL)
+            result(true)
+          } catch {
+            result(FlutterError(code: "DELETE_ERROR", message: error.localizedDescription, details: nil))
+          }
+        } else {
+          result(FlutterError(code: "INVALID_ARGUMENTS", message: "filePath not provided or invalid", details: nil))
+        }
       } else {
         result(FlutterMethodNotImplemented)
       }
